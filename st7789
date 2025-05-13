@@ -23,7 +23,6 @@ volatile uint8_t ToyotaNumBytes, ToyotaID;
 volatile uint8_t ToyotaData[TOYOTA_MAX_BYTES];
 volatile uint16_t ToyotaFailBit = 0;
  
- 
 // "names" for the OND data to make life easier
 #define OBD_INJ 1 //Injector pulse width (INJ)
 #define OBD_IGN 2 //Ignition timing angle (IGN)
@@ -43,11 +42,11 @@ unsigned long OBDLastSuccessPacket;
 int CurrentDisplayIDX;
  
  // Прототипы функций
-void drawFlagsBinary();
+void drawFlagsBinnary();
 void drawAllData();
 void drawSpeedRpm();
 void displayNoConnection();
-//void getOBDdata(int OBDdataIDX);
+void getOBDdata();
 void ButtonChangeState();
 void ChangeState();
 void debugdataoutput();
@@ -55,19 +54,20 @@ void debugfaildataoutput();
 
 // VOID SETUP
 void setup() {
-  tft.init(240, 320, SPI_MODE2); // Инициализация дисплея с разрешением 240x320 пикселей
-  tft.setRotation(1); // Поворот экрана на 90°
-  tft.fillScreen(ST77XX_BLACK); // Очистка экрана
-//  tft.drawFastHLine(0, 44, tft.width(), ST77XX_BLUE); // Синяя линия на экране
- // Создаем закрашенный и закругленный прямоугольник
- // Параметры: x, y, ширина, высота, радиус углов, цвет заливки
-//  tft.fillRoundRect(50, 50, 140, 140, 20, ST77XX_YELLOW); // Желтая рамка 
-  Serial.begin(115200);
-  if (DEBUG_OUTPUT) {
+   Serial.begin(115200);
+   tft.init(240, 320, SPI_MODE3); // Инициализация дисплея с разрешением 240x320 пикселей
+   tft.setRotation(1); // Поворот экрана на 90°
+   tft.fillScreen(ST77XX_BLACK); // Очистка экрана
+  // tft.drawFastHLine(20, 50, tft.width(), ST77XX_BLUE); // Синяя линия на экране
+//  Нарисовать рамку вокруг экрана
+//  Параметры: x, y, ширина, высота, радиус углов, цвет заливки
+  //tft.drawRoundRect(20, 50, 300, 150, 10, ST77XX_BLUE); // Рамка красного цвета
+   if (DEBUG_OUTPUT) {
     Serial.println("system Started");}
-  
+   
   // Display no connection
   displayNoConnection();
+//  delay(1000);   // Пауза между обновлениями (опционально)
   
   // setup input and output pins
   pinMode(ENGINE_DATA_PIN, INPUT); // _PULLUP
@@ -107,30 +107,79 @@ void loop() {
   if (OBDLastSuccessPacket + 3500 < millis() && OBDConnected) {
     // show no connection
      displayNoConnection();
-     // set OBDConnected to false.
+    // set OBDConnected to false.
      OBDConnected = false;
   } // end if loas conntcion
   
 } // end void loop 
  
- 
+
 // VOID drawScreenSelector()
 void drawScreenSelector() {
   if (CurrentDisplayIDX == 1){
      drawSpeedRpm();
    } else if (CurrentDisplayIDX == 2){
      drawAllData();
-     } else if (CurrentDisplayIDX == 3){
-//    drawFlagsBinnary();  
+   } else if (CurrentDisplayIDX == 3){
+    drawFlagsBinnary();  
    }
 } // end drawScreenSelector() 
- 
+
+ // ЭКРАН С БИНАРНЫМИ ДАННЫМИ
+void drawFlagsBinnary() {
+ // tft.fillScreen(ST77XX_BLACK); // Черный фон
+    tft.setTextColor(ST77XX_WHITE); // Белый текст
+    tft.setTextSize(1); // Нормальный размер текста
+    tft.setFont(&FreeSansBold18pt7b); // Наш шрифт
+  // Два первых значения в бинарном виде
+     tft.setCursor(0, 17); 
+     tft.print((int)(getOBDdata(11)), BIN);
+     tft.setCursor(0, 50); 
+     tft.print((int)(getOBDdata(12)), BIN);
+}// end void
+
+void drawAllData() {
+    tft.fillScreen(ST77XX_BLACK); // Заливаем экран черным фоном
+    tft.setTextColor(ST77XX_WHITE); // Устанавливаем белый цвет текста
+    tft.setTextSize(1); // Устанавливаем стандартный размер текста
+    tft.setFont(&FreeSansBold18pt7b); // Наш шрифт  //tft.setFont(&FreeMono12pt7b); // Устанавливаем шрифт
+
+    // Верхняя левая колонка
+    tft.setCursor(0, 17); tft.print("INJ ");
+    tft.setCursor(25, 17); tft.print(getOBDdata(OBD_INJ)); 
+
+    tft.setCursor(0, 32); tft.print("IGN ");
+    tft.setCursor(25, 32); tft.print(getOBDdata(OBD_IGN)); 
+
+    tft.setCursor(0, 47); tft.print("IAC ");
+    tft.setCursor(25, 47); tft.print(getOBDdata(OBD_IAC)); 
+
+    tft.setCursor(0, 62); tft.print("RPM ");
+    tft.setCursor(25, 62); tft.print(getOBDdata(OBD_RPM)); 
+
+    // Правая колонка
+    tft.setCursor(65, 17); tft.print("MAP ");
+    tft.setCursor(92, 17); tft.print(getOBDdata(OBD_MAP)); 
+
+    tft.setCursor(65, 32); tft.print("ECT ");
+    tft.setCursor(92, 32); tft.print(getOBDdata(OBD_ECT)); 
+
+    tft.setCursor(65, 47); tft.print("TPS ");
+    tft.setCursor(92, 47); tft.print(getOBDdata(OBD_TPS)); 
+
+    tft.setCursor(65, 62); tft.print("SPD ");
+    tft.setCursor(92, 62); tft.print(getOBDdata(OBD_SPD)); 
+
+    // Горизонтальная разделительная линия
+    tft.drawFastVLine(63, 0, 64, ST77XX_WHITE); // Белая вертикальная линия слева направо
+}
+
 // ЭКРАН СО СКОРОСТЬЮ И ОБОРОТАМИ
 void drawSpeedRpm() {
-  tft.fillScreen(ST77XX_BLACK); // Черный фон
-  tft.setTextColor(ST77XX_WHITE); // Белый текст
-  tft.setTextSize(1); // Нормальный размер текста
-  tft.setFont(&FreeSansBold18pt7b); // Наш шрифт
+   tft.fillScreen(ST77XX_BLACK); // Черный фон
+   tft.setTextColor(ST77XX_WHITE); // Белый текст
+   tft.setTextSize(1); // Нормальный размер текста
+   tft.setFont(&FreeSansBold18pt7b); // Наш шрифт
 
   // convert into to char so we can get the width
   char buf[4];
@@ -150,59 +199,75 @@ void drawSpeedRpm() {
 //  tft.setCursor(tft.width() / 2 - tft.textWidth(buf) / 2, 10); // Центрированная надпись
   tft.print(buf); // Показываем скорость
 
-  // Отображаем полоски оборотов
-  for (int i = 0; i < rpmToDisplay; i++) {
-  tft.fillRect(20 + ((4 + 1) * i) + i, 55, 4, 8, ST77XX_RED); // Красные полосы
-  }
+                // Отображаем полоски оборотов
+              for (int i = 0; i < rpmToDisplay; i++) {
+              tft.fillRect(20 + ((4 + 1) * i) + i, 55, 4, 8, ST77XX_RED); // Красные полосы
+             }
 }
+/*//picture loop РИСОВАНИЕ КАРТРИДЖЕЙ ДЛЯ ИНДИКАТОРОВ СКОРОСТИ И ОБОРОТОВ:
+    tft.setTextColor(ST77XX_WHITE);   // Белый цвет текста
+    tft.setTextSize(2);               // Увеличенный размер текста
+    tft.setCursor(tft.width() - tft.textWidth(buf) - 10, 10); // Текст справа от центра
 
-void drawAllData() {
-  tft.fillScreen(ST77XX_BLACK); // Черный фон
-  tft.setTextColor(ST77XX_WHITE); // Белый текст
-  tft.setTextSize(1); // Нормальный размер текста
-  tft.setFont(&FreeSansBold18pt7b); // Наш шрифт
+    // Отрисовка скоростей
+    tft.print(buf);                   // Выводим значение скорости
 
-  // Выводим все полученные данные
-  tft.setCursor(0, 17); tft.print("INJ:"); tft.print((int)(getOBDdata(OBD_INJ))); tft.println(" мс");
-  tft.setCursor(0, 32); tft.print("IGN:"); tft.print((int)(getOBDdata(OBD_IGN))); tft.println(" град.");
-  tft.setCursor(0, 47); tft.print("IAC:"); tft.print((int)(getOBDdata(OBD_IAC))); tft.println("%");
-  tft.setCursor(0, 62); tft.print("RPM:"); tft.print((int)(getOBDdata(OBD_RPM))); tft.println(" об/мин");
-  tft.setCursor(65, 17); tft.print("MAP:"); tft.print((int)(getOBDdata(OBD_MAP))); tft.println(" кПа");
-  tft.setCursor(65, 32); tft.print("ECT:"); tft.print((int)(getOBDdata(OBD_ECT))); tft.println(" °C");
-  tft.setCursor(65, 47); tft.print("TPS:"); tft.print((int)(getOBDdata(OBD_TPS))); tft.println(" град.");
-  tft.setCursor(65, 62); tft.print("SPD:"); tft.print((int)(getOBDdata(OBD_SPD))); tft.println(" км/ч");
+    // Отрисовка прямоугольника-индикатора скорости
+    //tft.drawRoundRect(20, 4, 90, 48, 7, ST77XX_GREEN); // Прямоугольник зелёного цвета
 
-  // Линия-разделитель
-//  tft.drawFastHLine(0, 44,  tft.width(), ST77XX_BLUE);    // draw horizontal blue line at position (0, 44)
- // tft.drawVLine(63, 0, 64, ST77XX_RED);
+    // Получаем значение оборотов
+    int rpmToDisplay = getOBDdata(OBD_RPM) / 500; // Максимально допустимо 14 баров
+    if (rpmToDisplay > 14) rpmToDisplay = 14;
+
+    // Индикатор оборотов
+    for (int i = 0; i < rpmToDisplay; ++i) {
+        tft.fillRect(20 + (5 * i), 55, 4, 8, ST77XX_RED); // Красные полосы оборотов
+    }
 }
-// ЭКРАН С БИНАРНЫМИ ДАННЫМИ
-void drawFlagsBinary() {
-//  tft.fillScreen(ST77XX_BLACK); // Черный фон
-  tft.setTextColor(ST77XX_WHITE); // Белый текст
-  tft.setTextSize(1); // Нормальный размер текста
-  tft.setFont(&FreeSansBold18pt7b); // Наш шрифт
-  // Два первых значения в бинарном виде
-  tft.setCursor(0, 17); 
-  tft.print((int)(getOBDdata(11)), BIN);
-  tft.setCursor(0, 50); 
-  tft.print((int)(getOBDdata(12)), BIN);
-}
+*/
+/*void drawSpeedRpm() {
+    // Настройки дисплея
+    tft.setTextWrap(false); // Запрещаем перенос строки автоматически
+    
+    // Получение значения скорости и преобразование в строку
+    char buf[4]; // Буфер для хранения строкового представления числа
+    itoa(getOBDdata(OBD_SPD), buf, 10); // Преобразуем скорость в строку
+    
+    // Вычисляем количество индикаторов оборотов
+    int rpmValue = getOBDdata(OBD_RPM); 
+    int rpmBars = rpmValue / 500; // Разделяем обороты на группы по 500 единиц
+    float decimalPart = double(rpmValue % 500) / 500.0; // Дробная часть
+    if(decimalPart >= 0.5) rpmBars++; // Округление вверх, если дробная часть больше половины шага
+
+    // Основной цикл вывода графики
+    tft.fillScreen(ST77XX_BLACK); // Чистим экран перед обновлением
+    tft.setTextColor(ST77XX_YELLOW); // Цвет текста жёлтый
+    tft.setTextSize(2); // Увеличиваем размер текста
+    
+    // Ширина текста и выравнивание справа
+    uint16_t textX = tft.width() - tft.textWidth(buf) - 10; // X координата текста
+    tft.setCursor(textX, 10); // Устанавливаем позицию для печати
+    tft.print(buf); // Печать текущего значения скорости
+    
+    // Рисуем рамку вокруг области показаний
+    //tft.drawRoundRect(20, 4, 90, 48, 7, ST77XX_GREEN); // Зелёная рамка
+    
+    // Рисуем индикатор оборотов
+    for(int i = 0; i < rpmBars && i <= 14; i++) {
+        tft.fillRect(20 + ((4 + 1) * i) + i, 55, 4, 8, ST77XX_BLUE); // Синяя полоска
+    }
+ */
  
 // ЭКРАН ПОТЕРИ СВЯЗИ
 void displayNoConnection() {
-//  tft.fillScreen(ST77XX_BLACK); // Черный фон
-  tft.setTextColor(ST77XX_RED); // Красный текст
-  tft.setTextSize(1); // Увеличенный размер текста
   tft.setFont(&FreeSansBold18pt7b); // Наш шрифт
-  
-// tft.fillRoundRect(20, 50, 280, 140, 20, ST77XX_YELLOW);
-// tft.drawRoundRect(0, 0, tft.width() - 1, tft.height() - 1, 7, ST77XX_YELLOW);
-
-  // Текст "NO SIGNAL" посередине экрана
-  tft.setCursor(60, 120);
-//  tft.setCursor((tft.width() - tft.textWidth("NO SIGNAL")) / 2, tft.height() / 2);
-  tft.print("NO SIGNAL");
+//tft.fillScreen(ST77XX_BLACK);        // Сначала очистим экран
+  tft.setTextSize(1);                  // Размер шрифта
+  tft.setTextColor(ST77XX_GREEN);      // WHITE Цвет текста белый
+  // Нарисовать рамку вокруг экрана
+ // tft.drawRoundRect(10, 10, 300,180, 20, ST77XX_GREEN); // Круглые углы зеленого цвета
+  tft.setCursor(60, 120);              // Установим позицию текста
+  tft.println("NO SIGNAL");           // Печатаем сообщение
 }
 
 // GET DATA FROM OBD
@@ -292,7 +357,6 @@ void ButtonChangeState() {
 } // end void  ButtonChangeState() 
  
  
- 
 // VOID CHANGE 
 void ChangeState()
 {
@@ -375,12 +439,8 @@ void ChangeState()
   } // end (InPacket == false)  
 } // end void change
  
- 
- 
- 
 // DEBUG OUTPUT VOIDS 
- 
- 
+
 void debugdataoutput() {
    // output to Serial.
     Serial.print("ID=");
