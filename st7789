@@ -37,7 +37,7 @@ volatile uint16_t ToyotaFailBit = 0;
 boolean OBDConnected;
 unsigned long OBDLastSuccessPacket;
  
-#define TOGGLE_BTN_PIN D3 // GPIO0
+#define TOGGLE_BTN_PIN D1 // 
 #define TOGGLE_BTN_INT 1
 int CurrentDisplayIDX;
  
