@@ -55,13 +55,13 @@ void debugfaildataoutput();
 // VOID SETUP
 void setup() {
    Serial.begin(115200);
-   tft.init(240, 320, SPI_MODE3); // Инициализация дисплея с разрешением 240x320 пикселей
+   tft.init(240, 320, SPI_MODE2); // Инициализация дисплея с разрешением 240x320 пикселей
    tft.setRotation(1); // Поворот экрана на 90°
    tft.fillScreen(ST77XX_BLACK); // Очистка экрана
   // tft.drawFastHLine(20, 50, tft.width(), ST77XX_BLUE); // Синяя линия на экране
 //  Нарисовать рамку вокруг экрана
 //  Параметры: x, y, ширина, высота, радиус углов, цвет заливки
-  //tft.drawRoundRect(20, 50, 300, 150, 10, ST77XX_BLUE); // Рамка красного цвета
+    tft.drawRoundRect(10, 50, 300, 150, 10, ST77XX_BLUE); // Рамка красного цвета
    if (DEBUG_OUTPUT) {
     Serial.println("system Started");}
    
@@ -194,7 +194,7 @@ void drawSpeedRpm() {
    // picture loop
   // Создаем закрашенный и закругленный прямоугольник
   // Параметры: x, y, ширина, высота, радиус углов, цвет заливки
- // tft.fillRoundRect(50, 50, 140, 140, 20, ST77XX_YELLOW); // Желтая рамка
+   tft.fillRoundRect(50, 50, 140, 140, 20, ST77XX_YELLOW); // Желтая рамка
   tft.setCursor(60, 120);
 //  tft.setCursor(tft.width() / 2 - tft.textWidth(buf) / 2, 10); // Центрированная надпись
   tft.print(buf); // Показываем скорость
@@ -204,8 +204,7 @@ void drawSpeedRpm() {
               tft.fillRect(20 + ((4 + 1) * i) + i, 55, 4, 8, ST77XX_RED); // Красные полосы
              }
 }
-/*
-//picture loop РИСОВАНИЕ КАРТРИДЖЕЙ ДЛЯ ИНДИКАТОРОВ СКОРОСТИ И ОБОРОТОВ:
+/*//picture loop РИСОВАНИЕ КАРТРИДЖЕЙ ДЛЯ ИНДИКАТОРОВ СКОРОСТИ И ОБОРОТОВ:
     tft.setTextColor(ST77XX_WHITE);   // Белый цвет текста
     tft.setTextSize(2);               // Увеличенный размер текста
     tft.setCursor(tft.width() - tft.textWidth(buf) - 10, 10); // Текст справа от центра
@@ -263,9 +262,9 @@ void drawSpeedRpm() {
 void displayNoConnection() {
   tft.setFont(&FreeSansBold18pt7b); // Наш шрифт
 //tft.fillScreen(ST77XX_BLACK);        // Сначала очистим экран
-  tft.setTextSize(1);                  // Размер шрифта
-  tft.setTextColor(ST77XX_GREEN);      // WHITE Цвет текста белый
-  // Нарисовать рамку вокруг экрана
+ // tft.setTextSize(1);                  // Размер шрифта
+ // tft.setTextColor(ST77XX_GREEN);      // WHITE Цвет текста белый
+ // Нарисовать рамку вокруг экрана
  // tft.drawRoundRect(10, 10, 300,180, 20, ST77XX_GREEN); // Круглые углы зеленого цвета
   tft.setCursor(60, 120);              // Установим позицию текста
   tft.println("NO SIGNAL");           // Печатаем сообщение
