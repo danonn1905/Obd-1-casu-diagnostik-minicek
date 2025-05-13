@@ -204,7 +204,8 @@ void drawSpeedRpm() {
               tft.fillRect(20 + ((4 + 1) * i) + i, 55, 4, 8, ST77XX_RED); // Красные полосы
              }
 }
-/*//picture loop РИСОВАНИЕ КАРТРИДЖЕЙ ДЛЯ ИНДИКАТОРОВ СКОРОСТИ И ОБОРОТОВ:
+/*
+//picture loop РИСОВАНИЕ КАРТРИДЖЕЙ ДЛЯ ИНДИКАТОРОВ СКОРОСТИ И ОБОРОТОВ:
     tft.setTextColor(ST77XX_WHITE);   // Белый цвет текста
     tft.setTextSize(2);               // Увеличенный размер текста
     tft.setCursor(tft.width() - tft.textWidth(buf) - 10, 10); // Текст справа от центра
