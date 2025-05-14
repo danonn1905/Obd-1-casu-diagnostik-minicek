@@ -109,9 +109,8 @@ void drawScreenSelector() {
     drawFlagsBinnary();  
    }
 } // end drawScreenSelector() 
- 
- 
- 
+
+
 void drawFlagsBinnary() {
   // graphic commands to redraw the complete screen should be placed here  
   u8g.setFont(u8g_font_osr18);
@@ -171,8 +170,6 @@ void drawAllData() {
 } // end void drawalldata
  
  
- 
- 
 // VOID DRAWSPEEDRPM 
 void drawSpeedRpm() {
  
@@ -223,7 +220,6 @@ void displayNoConnection() {
       } while( u8g.nextPage() );
       
 } // end void
- 
  
  
 // GET DATA FROM OBD
@@ -299,7 +295,6 @@ float getOBDdata(int OBDdataIDX) {
 } // end void getOBDdata
  
  
- 
 // VOID ButtonChangeState
 void ButtonChangeState() {
   int buttonState = digitalRead(TOGGLE_BTN_PIN);
@@ -313,7 +308,6 @@ void ButtonChangeState() {
   } // end if 
   
 } // end void  ButtonChangeState() 
- 
  
  
 // VOID CHANGE 
@@ -399,11 +393,7 @@ void ChangeState()
 } // end void change
  
  
- 
- 
 // DEBUG OUTPUT VOIDS 
- 
- 
 void debugdataoutput() {
    // output to Serial.
     Serial.print("ID=");
