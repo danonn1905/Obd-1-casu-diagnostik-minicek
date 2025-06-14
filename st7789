@@ -3,9 +3,9 @@
 #include <Fonts/FreeSansBold18pt7b.h>  // Подключаем удобный шрифт
 
 // Дисплей ST7789
-#define TFT_RST   D4     // TFT RST pin is connected to NodeMCU pin D4 (GPIO2)
-#define TFT_DC    D3     // TFT DC  pin is connected to NodeMCU pin D3 (GPIO0)
-#define TFT_CS    D8     // TFT CS  pin is connected to NodeMCU pin D8 (GPIO15)
+#define TFT_RST   D0     // TFT RST pin is connected to NodeMCU pin D4 (GPIO2)
+#define TFT_DC    D1     // TFT DC  pin is connected to NodeMCU pin D3 (GPIO0)
+#define TFT_CS    D2     // TFT CS  pin is connected to NodeMCU pin D8 (GPIO15)
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 // for debug option - swith output to Serial
