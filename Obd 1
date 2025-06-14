@@ -1,12 +1,15 @@
 // ToyotaOBD1_Reader 
-// Code by Tal Ofer https://pastebin.com/clone/HMfR7u8T (talofer99@hotmail.com)
-// In order to read the data from the OBD connector, short E1 + TE2. then to read the data connect to VF1.
-// Note the data line output is 12V - connecting it directly to one of the arduino pins might damage (proabably) the board
-// This is made for diaply with an OLED display using the U8glib - which allow wide range of display types with minor adjusments.
-// Many thanks to GadgetFreak for the greate base code for the reasding of the data.
-// If you want to use invert line - note the comments on the MY_HIGH and the INPUT_PULLUP in the SETUP void.
+// Код, указанный пользователем https://pastebin.com/clone/HMfR7u8T (talofer99@hotmail.com)
+// Чтобы считывать данные с разъема OBD, соедините короткие команды E1 + TE2.
+// Затем для считывания данных подключитесь к разъему VF1.
+// Обратите внимание, что линейный выход для передачи данных имеет напряжение 12 В - 
+// Подключение его непосредственно к одному из контактов arduino может привести (вероятно) к повреждению платы
+// Это сделано для использования с OLED-дисплеем, использующим U8glib, 
+// Который позволяет использовать широкий спектр типов дисплеев с незначительными настройками.
+// Большое спасибо GadgetFreak за отличный базовый код для пересчета данных.
+// Если вы хотите использовать invert line - обратите внимание на комментарии к MY_HIGH и INPUT_PULLUP в поле SETUP void.
 
-// display 
+
 #include "U8glib.h"
 U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_NONE);
 
@@ -16,7 +19,7 @@ U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_NONE);
 #define ENGINE_DATA_INT 0  // for attachInterrupt
 #define LED_PIN          13
 
-// I have inverted the Eng line using an Opto-Coupler, if yours isn't then reverse these low & high defines.
+// Я инвертировал линию Eng с помощью оптического соединителя, если у вас его нет, то измените эти значения low & high на противоположные.
 #define  MY_HIGH  HIGH //LOW
 #define  MY_LOW   LOW //HIGH
 
@@ -26,7 +29,7 @@ volatile uint8_t ToyotaData[TOYOTA_MAX_BYTES];
 volatile uint16_t ToyotaFailBit = 0;
 
 
-// "names" for the OND data to make life easier
+// "имена" для данных OND, чтобы облегчить жизнь
 #define OBD_INJ 1 //Injector pulse width (INJ)
 #define OBD_IGN 2 //Ignition timing angle (IGN)
 #define OBD_IAC 3 //Idle Air Control (IAC)
@@ -36,7 +39,7 @@ volatile uint16_t ToyotaFailBit = 0;
 #define OBD_TPS 7 // Throttle Position Sensor (TPS)
 #define OBD_SPD 8 //Speed (SPD)
 
-// dfeine connection flag and last success packet - for lost connection function.
+// Определяет флаг соединения и последний успешный пакет - для функции потери соединения.
 boolean OBDConnected;
 unsigned long OBDLastSuccessPacket;
 
@@ -53,17 +56,17 @@ void setup() {
   // Display no connection
   displayNoConnection();
   
-  // setup input and output pins
+  // настройка входных и выходных контактов
   pinMode(ENGINE_DATA_PIN, INPUT); // _PULLUP
   pinMode(LED_PIN, OUTPUT);
   //setup Interrupt for data line
   attachInterrupt(ENGINE_DATA_INT, ChangeState, CHANGE);
   
-  //setup button
+ //кнопка настройки
   pinMode(TOGGLE_BTN_PIN, INPUT);
   attachInterrupt(TOGGLE_BTN_INT, ButtonChangeState, CHANGE);
   
-  // Set OBD to not connected
+ / Установите OBD в положение "не подключен"
   OBDConnected=false;
   CurrentDisplayIDX = 1; // set to display 1
 } // END VOID SETUP
@@ -85,10 +88,10 @@ void loop() {
      ToyotaNumBytes = 0;
   } // end if (ToyotaNumBytes > 0)
   
-  // if found FAILBIT and dbug
+  // если найден СБОЙНЫЙ бит и dbug
   if (ToyotaFailBit > 0 && DEBUG_OUTPUT )  { debugfaildataoutput(); } 
   
-  //check for lost connection
+  //проверьте, не потеряно ли соединение
   if (OBDLastSuccessPacket + 3500 < millis() && OBDConnected) {
     // show no connection
      displayNoConnection();
