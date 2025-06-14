@@ -66,7 +66,7 @@ void setup() {
   pinMode(TOGGLE_BTN_PIN, INPUT);
   attachInterrupt(TOGGLE_BTN_INT, ButtonChangeState, CHANGE);
   
- / Установите OBD в положение "не подключен"
+// Установите OBD в положение "не подключен"
   OBDConnected=false;
   CurrentDisplayIDX = 1; // set to display 1
 } // END VOID SETUP
