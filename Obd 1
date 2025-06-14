@@ -1,31 +1,31 @@
 // ToyotaOBD1_Reader 
-// Code by Tal Ofer (talofer99@hotmail.com)
+// Code by Tal Ofer https://pastebin.com/clone/HMfR7u8T (talofer99@hotmail.com)
 // In order to read the data from the OBD connector, short E1 + TE2. then to read the data connect to VF1.
 // Note the data line output is 12V - connecting it directly to one of the arduino pins might damage (proabably) the board
 // This is made for diaply with an OLED display using the U8glib - which allow wide range of display types with minor adjusments.
 // Many thanks to GadgetFreak for the greate base code for the reasding of the data.
 // If you want to use invert line - note the comments on the MY_HIGH and the INPUT_PULLUP in the SETUP void.
- 
+
 // display 
 #include "U8glib.h"
 U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_NONE);
- 
+
 // for debug option - swith output to Serial
 #define DEBUG_OUTPUT true
 #define ENGINE_DATA_PIN 2 // pin 2
 #define ENGINE_DATA_INT 0  // for attachInterrupt
 #define LED_PIN          13
- 
+
 // I have inverted the Eng line using an Opto-Coupler, if yours isn't then reverse these low & high defines.
 #define  MY_HIGH  HIGH //LOW
 #define  MY_LOW   LOW //HIGH
- 
+
 #define  TOYOTA_MAX_BYTES  24
 volatile uint8_t ToyotaNumBytes, ToyotaID;
 volatile uint8_t ToyotaData[TOYOTA_MAX_BYTES];
 volatile uint16_t ToyotaFailBit = 0;
- 
- 
+
+
 // "names" for the OND data to make life easier
 #define OBD_INJ 1 //Injector pulse width (INJ)
 #define OBD_IGN 2 //Ignition timing angle (IGN)
@@ -35,15 +35,15 @@ volatile uint16_t ToyotaFailBit = 0;
 #define OBD_ECT 6 //Engine Coolant Temperature (ECT)
 #define OBD_TPS 7 // Throttle Position Sensor (TPS)
 #define OBD_SPD 8 //Speed (SPD)
- 
+
 // dfeine connection flag and last success packet - for lost connection function.
 boolean OBDConnected;
 unsigned long OBDLastSuccessPacket;
- 
+
 #define TOGGLE_BTN_PIN 3
 #define TOGGLE_BTN_INT 1
 int CurrentDisplayIDX;
- 
+
 // VOID SETUP
 void setup() {
   Serial.begin(115200);
@@ -67,8 +67,8 @@ void setup() {
   OBDConnected=false;
   CurrentDisplayIDX = 1; // set to display 1
 } // END VOID SETUP
- 
- 
+
+
 // VOID LOOP
 void loop() {
   // if found bytes
@@ -97,8 +97,8 @@ void loop() {
   } // end if loas conntcion
   
 } // end void loop 
- 
- 
+
+
 // VOID drawScreenSelector()
 void drawScreenSelector() {
   if (CurrentDisplayIDX == 1){
@@ -111,10 +111,11 @@ void drawScreenSelector() {
 } // end drawScreenSelector() 
 
 
+
 void drawFlagsBinnary() {
   // graphic commands to redraw the complete screen should be placed here  
   u8g.setFont(u8g_font_osr18);
- 
+
   // picture loop
   u8g.firstPage();  
    do {
@@ -124,8 +125,8 @@ void drawFlagsBinnary() {
       u8g.print( int(getOBDdata(12)),BIN);
   } while( u8g.nextPage() ); // end picture loop
 } // end void
- 
- 
+
+
 void drawAllData() {
   // graphic commands to redraw the complete screen should be placed here  
   u8g.setFont(u8g_font_unifont);
@@ -168,8 +169,10 @@ void drawAllData() {
           u8g.drawVLine(63, 0, 64);
     } while( u8g.nextPage() ); // end picture loop
 } // end void drawalldata
- 
- 
+
+
+
+
 // VOID DRAWSPEEDRPM 
 void drawSpeedRpm() {
  
@@ -182,7 +185,7 @@ void drawSpeedRpm() {
   // convert into to char so we can get the width
   char buf[4];
   itoa (int(getOBDdata(OBD_SPD)), buf, 10);
- 
+
   // "calc" rpm bars to diaply - MAX 14 
   int rpmToDisplay = int (float(getOBDdata(OBD_RPM))/500);// calc the rpm bars    then check to add +1 if pased the +250
   if (double(double(getOBDdata(OBD_RPM))/500.0) - int(getOBDdata(OBD_RPM)/500) > 0.5) {
@@ -204,7 +207,7 @@ void drawSpeedRpm() {
      } while( u8g.nextPage() ); // end picture loop
        
 } //end void drawSpeedRpm()
- 
+
 // NO CONNECTION VOID
 void displayNoConnection() {
    u8g.setFont(u8g_font_courB12r);
@@ -220,8 +223,9 @@ void displayNoConnection() {
       } while( u8g.nextPage() );
       
 } // end void
- 
- 
+
+
+
 // GET DATA FROM OBD
 float getOBDdata(int OBDdataIDX) {
  // define return value
@@ -293,8 +297,9 @@ float getOBDdata(int OBDdataIDX) {
   // send value back
   return returnValue;
 } // end void getOBDdata
- 
- 
+
+
+
 // VOID ButtonChangeState
 void ButtonChangeState() {
   int buttonState = digitalRead(TOGGLE_BTN_PIN);
@@ -308,8 +313,9 @@ void ButtonChangeState() {
   } // end if 
   
 } // end void  ButtonChangeState() 
- 
- 
+
+
+
 // VOID CHANGE 
 void ChangeState()
 {
@@ -318,7 +324,7 @@ void ChangeState()
   static boolean InPacket = false;
   static unsigned long StartMS;
   static uint16_t BitCount;
- 
+
   int state = digitalRead(ENGINE_DATA_PIN);
   digitalWrite(LED_PIN, state);
   
@@ -391,9 +397,13 @@ void ChangeState()
     } // end while
   } // end (InPacket == false)  
 } // end void change
- 
- 
+
+
+
+
 // DEBUG OUTPUT VOIDS 
+
+
 void debugdataoutput() {
    // output to Serial.
     Serial.print("ID=");
@@ -405,7 +415,7 @@ void debugdataoutput() {
     }
      Serial.println(".");
 } // end void
- 
+
 void debugfaildataoutput() {
         Serial.print("FAIL = ");
         Serial.print(ToyotaFailBit);
