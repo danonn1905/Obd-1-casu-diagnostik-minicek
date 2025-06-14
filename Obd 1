@@ -15,7 +15,7 @@ U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_NONE);
 
 // for debug option - swith output to Serial
 #define DEBUG_OUTPUT true
-#define ENGINE_DATA_PIN 2 // pin 2
+#define ENGINE_DATA_PIN 3 // pin 2
 #define ENGINE_DATA_INT 0  // for attachInterrupt
 #define LED_PIN          13
 
@@ -43,7 +43,7 @@ volatile uint16_t ToyotaFailBit = 0;
 boolean OBDConnected;
 unsigned long OBDLastSuccessPacket;
 
-#define TOGGLE_BTN_PIN 3
+#define TOGGLE_BTN_PIN 5
 #define TOGGLE_BTN_INT 1
 int CurrentDisplayIDX;
 
