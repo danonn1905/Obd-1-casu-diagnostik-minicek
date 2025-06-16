@@ -10,8 +10,8 @@ Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 // for debug option - swith output to Serial
 #define DEBUG_OUTPUT true
-#define ENGINE_DATA_PIN D4 // GPIO4
-#define ENGINE_DATA_INT 0  // for attachInterrupt
+#define ENGINE_DATA_PIN D4 // GPIO2
+#define ENGINE_DATA_INT 2  // or another correct number based on your board's documentation
 #define LED_PIN         12
  
 // I have inverted the Eng line using an Opto-Coupler, if yours isn't then reverse these low & high defines.
